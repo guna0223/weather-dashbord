@@ -40,3 +40,37 @@ function displayWether(data) {
     wind.textContent = `Wind speed : ${currentCondition.windspeedKmph} km/h`;
     weatherinfo.style.display = "block"
 }
+
+function displayWether(data) {
+    const currentCondition = data.current_condition[0];
+    const tempC = Number(currentCondition.temp_C);
+
+    cityName.textContent = data.nearest_area[0].areaName[0].value;
+    temperature.textContent = `Temperature: ${tempC}°C`;
+    weather.textContent = `Weather : ${currentCondition.weatherDesc[0].value}`;
+    humidity.textContent = `Humidity : ${currentCondition.humidity}%`;
+    wind.textContent = `Wind speed : ${currentCondition.windspeedKmph} km/h`;
+    weatherinfo.style.display = "block";
+
+    const tempImage = document.getElementById("tempImage");
+
+    if (tempC > 50) {
+        tempImage.style.backgroundColor = "red";
+    } else {
+        tempImage.style.backgroundColor = "green";
+    }
+    tempImage.style.display = "block";
+}
+
+
+const themeImg = document.getElementById("themeToggle");
+
+themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+
+    if (document.body.classList.contains("dark")) {
+        themeImg.style.backgroundColor= "";
+    } else {
+        themeImg.style.backgroundImage = "url('/assets/images/sun.png')";
+    }
+});
