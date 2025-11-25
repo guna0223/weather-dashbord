@@ -3,37 +3,38 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="/assets/images/favicon/sun.png" type="image/x-icon">
     <link rel="stylesheet" href="/assets/css/style.css" />
-    <title>Weather Dashbord</title>
+    <title>Weather Dashboard</title>
 </head>
 
 <body>
     <img src="assets/images/bg-img.jpg" class="bg-img">
+
+    <button id="themeToggle">🌙</button>
+
     <div class="container">
         <h1>Weather Dashboard</h1>
+
         <div class="search-box">
             <input type="text" id="cityInput" placeholder="Enter city name" />
             <button id="searchBtn">Search</button>
         </div>
-        <p id="loading">Loading</p>
+
+        <p id="loading">Loading...</p>
+
         <div class="weather-info">
             <h2 id="cityName"></h2>
             <p id="temperature"></p>
             <p id="weather"></p>
             <p id="humidity"></p>
             <p id="wind"></p>
+            <img id="tempImage" />
         </div>
-    </div>
-    <div>
-        <img id="tempImage" style="width:120px; display:none; margin-top:10px;" />
+
     </div>
 
-    <!-- <div class="theme">
-        <button id="themeToggle"><img src="assets/images/sun.png" alt="" width="20px" height="20px" id="themeImg"></button>
-    </div> -->
     <script src="/assets/js/script.js"></script>
 </body>
 

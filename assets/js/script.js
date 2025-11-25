@@ -1,76 +1,109 @@
 const searchBtn = document.querySelector("#searchBtn");
-const cityInput = document.querySelector('#cityInput');
-const cityName = document.querySelector('#cityName');
-const temperature = document.querySelector('#temperature');
-const weather = document.querySelector('#weather');
-const humidity = document.querySelector('#humidity');
-const wind = document.querySelector('#wind');
-const loading = document.querySelector('#loading')
-const weatherinfo = document.querySelector('.weather-info');
+const cityInput = document.querySelector("#cityInput");
 
-searchBtn.addEventListener('click', () => {
-    const city = cityInput.value;
-    console.log(city)
-    if (city) {
-        fetchWether(city);
+const cityName = document.querySelector("#cityName");
+const temperature = document.querySelector("#temperature");
+const weatherText = document.querySelector("#weather");
+const humidity = document.querySelector("#humidity");
+const wind = document.querySelector("#wind");
+
+const loading = document.querySelector("#loading");
+const weatherInfo = document.querySelector(".weather-info");
+const tempImage = document.querySelector("#tempImage");
+
+const themeToggle = document.querySelector("#themeToggle");
+
+// ------------------------------
+// SEARCH BUTTON
+// ------------------------------
+searchBtn.addEventListener("click", () => {
+    const city = cityInput.value.trim();
+
+    if (!city) {
+        showError("Please enter a city name.");
+        return;
     }
+
+    fetchWeather(city);
 });
 
-async function fetchWether(city) {
-    const url = `https://wttr.in/${city}?format=j1`
+
+// ------------------------------
+// FETCH WEATHER DATA
+// ------------------------------
+async function fetchWeather(city) {
+    const url = `https://wttr.in/${city}?format=j1`;
 
     try {
-        loading.style.display = 'block'
+        weatherInfo.style.display = "none";
+        loading.style.display = "block";
+        loading.textContent = "Loading...";
+
         const response = await fetch(url);
+
         if (!response.ok) {
-            throw new Error(`city not fount`)
+            throw new Error("City not found");
         }
+
         const data = await response.json();
-        displayWether(data);
-        loading.style.display = 'none';
-    } catch (error) { }
+        displayWeather(data);
+
+    } catch (error) {
+        showError("City not found. Try again!");
+    } finally {
+        loading.style.display = "none";
+    }
 }
 
-function displayWether(data) {
-    const currentCondition = data.current_condition[0];
-    cityName.textContent = data.nearest_area[0].areaName[0].value;
-    temperature.textContent = `temperature: ${currentCondition.temp_C} c`;
-    weather.textContent = `weather : ${currentCondition.weatherDesc[0].value}`;
-    humidity.textContent = `humidity : ${currentCondition.humidity}%`;
-    wind.textContent = `Wind speed : ${currentCondition.windspeedKmph} km/h`;
-    weatherinfo.style.display = "block"
-}
 
-function displayWether(data) {
-    const currentCondition = data.current_condition[0];
-    const tempC = Number(currentCondition.temp_C);
+// ------------------------------
+// DISPLAY WEATHER INFO
+// ------------------------------
+function displayWeather(data) {
+    const current = data.current_condition[0];
+    const tempC = Number(current.temp_C);
 
     cityName.textContent = data.nearest_area[0].areaName[0].value;
     temperature.textContent = `Temperature: ${tempC}°C`;
-    weather.textContent = `Weather : ${currentCondition.weatherDesc[0].value}`;
-    humidity.textContent = `Humidity : ${currentCondition.humidity}%`;
-    wind.textContent = `Wind speed : ${currentCondition.windspeedKmph} km/h`;
-    weatherinfo.style.display = "block";
+    weatherText.textContent = `Weather: ${current.weatherDesc[0].value}`;
+    humidity.textContent = `Humidity: ${current.humidity}%`;
+    wind.textContent = `Wind Speed: ${current.windspeedKmph} km/h`;
 
-    const tempImage = document.getElementById("tempImage");
+    weatherInfo.style.display = "block";
 
-    if (tempC > 50) {
-        tempImage.style.backgroundColor = "red";
-    } else {
-        tempImage.style.backgroundColor = "green";
-    }
-    tempImage.style.display = "block";
+    updateTempIcon(tempC);
 }
 
 
-const themeImg = document.getElementById("themeToggle");
+// ------------------------------
+// SHOW ERROR
+// ------------------------------
+function showError(msg) {
+    loading.style.display = "block";
+    loading.textContent = msg;
+    loading.style.color = "red";
 
+    weatherInfo.style.display = "none";
+
+    setTimeout(() => {
+        loading.style.display = "none";
+        loading.style.color = "white";
+    }, 2000);
+}
+
+
+
+// ------------------------------
+// THEME TOGGLE
+// ------------------------------
 themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
 
     if (document.body.classList.contains("dark")) {
-        themeImg.style.backgroundColor= "";
+        themeToggle.textContent = "☀️";
+        themeToggle.src = "/assets/images/sun.png";
     } else {
-        themeImg.style.backgroundImage = "url('/assets/images/sun.png')";
+        themeToggle.textContent = "🌙";
+        themeToggle.src = "/assets/images/moon.png";
     }
 });
