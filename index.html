@@ -4,38 +4,64 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="/assets/images/favicon/sun.png" type="image/x-icon">
-    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="shortcut icon" href="assets/images/favicon/sun.png" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <title>Weather Dashboard</title>
 </head>
 
 <body>
-    <img src="assets/images/bg-img.jpg" class="bg-img">
+    <img src="assets/images/bg-img.jpg" class="bg-img" alt="Background">
 
-    <button id="themeToggle">🌙</button>
+    <button id="themeToggle" title="Toggle Theme">🌙</button>
 
     <div class="container">
-        <h1>Weather Dashboard</h1>
+        <h1>☀️ Weather Dashboard</h1>
 
         <div class="search-box">
-            <input type="text" id="cityInput" placeholder="Enter city name" />
+            <input type="text" id="cityInput" placeholder="Enter city name..." autocomplete="off" />
             <button id="searchBtn">Search</button>
         </div>
 
-        <p id="loading">Loading...</p>
-
-        <div class="weather-info">
-            <h2 id="cityName"></h2>
-            <p id="temperature"></p>
-            <p id="weather"></p>
-            <p id="humidity"></p>
-            <p id="wind"></p>
-            <img id="tempImage" />
+        <div id="loading">
+            <span class="loading-spinner"></span>
+            Loading...
         </div>
 
+        <div class="weather-suggestions" id="suggestions"></div>
+
+        <div class="weather-info" id="weatherInfo">
+            <img class="weather-icon" id="tempImage" alt="Weather Icon">
+            <h2 id="cityName"></h2>
+            <p class="temp-display" id="temperature"></p>
+            <p class="weather-desc" id="weather"></p>
+            
+            <div class="weather-details">
+                <div class="detail-item">
+                    <div class="icon">💧</div>
+                    <div class="label">Humidity</div>
+                    <div class="value" id="humidity"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="icon">💨</div>
+                    <div class="label">Wind</div>
+                    <div class="value" id="wind"></div>
+                </div>
+                <div class="detail-item">
+                    <div class="icon">🌡️</div>
+                    <div class="label">Feels Like</div>
+                    <div class="value" id="feelsLike"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorContainer"></div>
     </div>
 
-    <script src="/assets/js/script.js"></script>
+    <!-- Weather condition info -->
+    <div id="weatherTips" style="display: none;"></div>
+
+    <script src="assets/js/script.js"></script>
 </body>
 
 </html>
