@@ -1,152 +1,270 @@
-// DOM Elements
+
+
+
+// ========================
+// DOM ELEMENT SELECTIONS
+// ========================
+// These elements correspond to the new HTML structure
+
+// Search elements
 const searchBtn = document.querySelector("#searchBtn");
 const cityInput = document.querySelector("#cityInput");
+
+// Weather display elements
 const cityName = document.querySelector("#cityName");
 const temperature = document.querySelector("#temperature");
 const weatherText = document.querySelector("#weather");
 const humidity = document.querySelector("#humidity");
 const wind = document.querySelector("#wind");
 const feelsLike = document.querySelector("#feelsLike");
-const loading = document.querySelector("#loading");
-const weatherInfo = document.querySelector(".weather-info");
+const visibilityEl = document.querySelector("#visibility");
+const pressureEl = document.querySelector("#pressure");
+const uvIndexEl = document.querySelector("#uvIndex");
 const tempImage = document.querySelector("#tempImage");
-const themeToggle = document.querySelector("#themeToggle");
+
+// UI container elements
+const loading = document.querySelector("#loading");
+const weatherInfo = document.querySelector("#weatherInfo");
 const suggestions = document.querySelector("#suggestions");
 const errorContainer = document.querySelector("#errorContainer");
-const bgImg = document.querySelector(".bg-img");
+const notification = document.querySelector("#notification");
 
-// Weather icons mapping
+// Theme toggle
+const themeToggle = document.querySelector("#themeToggle");
+
+// Copy button (NEW - added for new UI)
+const copyWeatherBtn = document.querySelector("#copyWeatherBtn");
+
+
+// ========================
+// WEATHER ICONS CONFIG
+// ========================
+// Maps weather conditions to Font Awesome icons
 const weatherIcons = {
-    sunny: '☀️',
-    clear: '☀️',
-    cloudy: '☁️',
-    overcast: '☁️',
-    partly_cloudy: '⛅',
-    rain: '🌧️',
-    drizzle: '🌦️',
-    thunderstorm: '⛈️',
-    snow: '❄️',
-    fog: '🌫️',
-    mist: '🌫️',
-    default: '🌡️'
+    sunny: 'fa-sun',
+    clear: 'fa-sun',
+    cloudy: 'fa-cloud',
+    overcast: 'fa-cloud',
+    partly: 'fa-cloud-sun',
+    rain: 'fa-cloud-rain',
+    drizzle: 'fa-cloud-showers-heavy',
+    thunderstorm: 'fa-bolt',
+    snow: 'fa-snowflake',
+    fog: 'fa-smog',
+    mist: 'fa-smog',
+    default: 'fa-temperature-high'
 };
 
-// Popular cities for quick access
-const popularCities = ['New York', 'London', 'Tokyo', 'Paris', 'Sydney', 'Dubai', 'Singapore', 'Mumbai'];
 
-// Initialize
+// ========================
+// POPULAR CITIES LIST
+// ========================
+// Quick access cities displayed in the UI
+const popularCities = [
+    'New York', 
+    'London', 
+    'Tokyo', 
+    'Paris', 
+    'Sydney', 
+    'Dubai', 
+    'Singapore', 
+    'Mumbai'
+];
+
+
+// ========================
+// INITIALIZATION
+// ========================
+// Runs when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    showSuggestions();
+    // Show popular city suggestions
+    renderSuggestions();
+    
+    // Load saved theme preference
     loadTheme();
 });
 
-// ------------------------------
+
+// ========================
 // SEARCH FUNCTIONALITY
-// ------------------------------
+// ========================
+// Handle search button click
 searchBtn.addEventListener("click", () => {
     const city = cityInput.value.trim();
+    
     if (!city) {
         showError("Please enter a city name!");
         shakeElement(cityInput);
         return;
     }
+    
     fetchWeather(city);
 });
 
-// Enter key support
+
+// Handle Enter key in search input
 cityInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
         const city = cityInput.value.trim();
+        
         if (!city) {
             showError("Please enter a city name!");
             shakeElement(cityInput);
             return;
         }
+        
         fetchWeather(city);
     }
 });
 
-// ------------------------------
-// FETCH WEATHER DATA
-// ------------------------------
+
+// ========================
+// WEATHER DATA FETCHING
+// ========================
+// Fetches weather data from wttr.in API
 async function fetchWeather(city) {
+    // Using wttr.in weather API - free, no API key required
     const url = `https://wttr.in/${city}?format=j1`;
 
     try {
+        // Show loading state
         showLoading(true);
+        
+        // Clear any previous errors
         errorContainer.innerHTML = '';
         
+        // Fetch weather data from API
         const response = await fetch(url);
         
+        // Check if city was found
         if (!response.ok) {
             throw new Error("City not found");
         }
 
+        // Parse JSON response
         const data = await response.json();
+        
+        // Display weather information
         displayWeather(data);
         
-        // Update background based on weather
-        updateBackground(data.current_condition[0].weatherDesc[0].value);
-        
     } catch (error) {
+        // Show error message to user
         showError(`❌ City "${city}" not found. Please try again!`);
+        
+        // Shake the container for visual feedback
         shakeElement(document.querySelector('.container'));
+        
     } finally {
+        // Hide loading indicator
         showLoading(false);
     }
 }
 
-// ------------------------------
-// DISPLAY WEATHER INFO
-// ------------------------------
+
+// ========================
+// WEATHER DISPLAY
+// ========================
+// Updates the UI with weather data
 function displayWeather(data) {
+    // Extract current conditions from API response
     const current = data.current_condition[0];
     const area = data.nearest_area[0];
     
-    // Update main info with animation
+    // Update city name with animation
     animateText(cityName, area.areaName[0].value);
     
+    // Parse temperature values
     const tempC = Number(current.temp_C);
     const tempF = Number(current.temp_F);
     const feelsLikeC = Number(current.FeelsLikeC);
     
-    animateText(temperature, `${tempC}°C / ${tempF}°F`);
-    animateText(weatherText, current.weatherDesc[0].value);
+    // Update temperature display
+    animateText(temperature, `${tempC}°C`);
+    
+    // Update temperature unit with Fahrenheit
+    const tempUnit = document.querySelector('.temp-unit');
+    if (tempUnit) {
+        tempUnit.textContent = `/ ${tempF}°F`;
+    }
+    
+    // Update weather condition description
+    const weatherDesc = current.weatherDesc[0].value;
+    animateText(weatherText, weatherDesc);
+    
+    // Update detail cards
     animateText(humidity, `${current.humidity}%`);
     animateText(wind, `${current.windspeedKmph} km/h`);
     animateText(feelsLike, `${feelsLikeC}°C`);
     
-    // Set weather icon
-    const weatherCondition = current.weatherDesc[0].value.toLowerCase();
+    // Update visibility (NEW)
+    if (visibilityEl) {
+        const visibility = Number(current.visibility) / 10; // Convert to km
+        animateText(visibilityEl, `${visibility.toFixed(1)} km`);
+    }
+    
+    // Update pressure (NEW)
+    if (pressureEl) {
+        animateText(pressureEl, `${current.pressure} hPa`);
+    }
+    
+    // Update UV index (placeholder - API doesn't provide this)
+    if (uvIndexEl) {
+        // Using a calculated value based on cloud cover as approximation
+        const cloudCover = Number(current.cloudcover);
+        const uvIndex = cloudCover > 50 ? 'Low' : (cloudCover > 20 ? 'Moderate' : 'High');
+        animateText(uvIndexEl, uvIndex);
+    }
+    
+    // Set weather icon based on condition
+    const weatherCondition = weatherDesc.toLowerCase();
     tempImage.src = getWeatherIconUrl(weatherCondition);
     tempImage.style.display = 'block';
     
-    // Show weather info with animation
-    weatherInfo.style.display = 'block';
+    // Add error handler for icon loading
+    tempImage.onerror = function() {
+        // Fallback to a simple emoji if image fails
+        this.style.display = 'none';
+        // Create a fallback emoji element
+        const fallback = document.createElement('div');
+        fallback.className = 'weather-icon-fallback';
+        fallback.style.cssText = 'font-size: 60px; margin: 10px auto;';
+        fallback.textContent = getWeatherEmoji(weatherCondition);
+        tempImage.parentElement.appendChild(fallback);
+    };
+    
+    // Show weather info section with animation
+    weatherInfo.classList.add('active');
     weatherInfo.style.animation = 'none';
-    weatherInfo.offsetHeight; // Trigger reflow
+    weatherInfo.offsetHeight; // Trigger reflow to restart animation
     weatherInfo.style.animation = 'fadeInUp 0.5s ease-out';
     
-    // Hide suggestions after search
+    // Clear suggestions after successful search
     suggestions.innerHTML = '';
+    
+    // Re-render suggestions (hide quick cities after search)
+    renderSuggestions();
 }
 
-// ------------------------------
-// LOADING STATE
-// ------------------------------
+
+// ========================
+// LOADING STATE MANAGEMENT
+// ========================
+// Shows or hides the loading indicator
 function showLoading(isLoading) {
     if (isLoading) {
-        loading.style.display = 'block';
-        weatherInfo.style.display = 'none';
+        loading.classList.add('active');
+        weatherInfo.classList.remove('active');
         errorContainer.innerHTML = '';
     } else {
-        loading.style.display = 'none';
+        loading.classList.remove('active');
     }
 }
 
-// ------------------------------
+
+// ========================
 // ERROR HANDLING
-// ------------------------------
+// ========================
+// Displays error message to user
 function showError(message) {
     errorContainer.innerHTML = `<div class="error-message">${message}</div>`;
     errorContainer.style.animation = 'none';
@@ -154,15 +272,11 @@ function showError(message) {
     errorContainer.style.animation = 'fadeInUp 0.3s ease-out';
 }
 
-function shakeElement(element) {
-    element.style.animation = 'none';
-    element.offsetHeight;
-    element.style.animation = 'shake 0.5s ease';
-}
 
-// ------------------------------
-// ANIMATIONS
-// ------------------------------
+// ========================
+// ANIMATION FUNCTIONS
+// ========================
+// Adds text update animation
 function animateText(element, text) {
     element.style.opacity = '0';
     element.style.transform = 'translateY(10px)';
@@ -175,11 +289,21 @@ function animateText(element, text) {
     }, 150);
 }
 
-// ------------------------------
+
+// Shakes an element for visual feedback
+function shakeElement(element) {
+    element.style.animation = 'none';
+    element.offsetHeight;
+    element.style.animation = 'shake 0.5s ease';
+}
+
+
+// ========================
 // WEATHER ICONS
-// ------------------------------
+// ========================
+// Returns appropriate weather icon URL based on condition
 function getWeatherIconUrl(condition) {
-    // Use wttr.in's weather icons
+    // Icon mapping for wttr.in PNG icons
     const iconMap = {
         'sunny': 'https://wttr.in/png/sunny.png',
         'clear': 'https://wttr.in/png/sunny.png',
@@ -194,127 +318,155 @@ function getWeatherIconUrl(condition) {
         'mist': 'https://wttr.in/png/fog.png'
     };
     
+    // Find matching icon based on condition keywords
     for (const [key, url] of Object.entries(iconMap)) {
         if (condition.includes(key)) {
             return url;
         }
     }
     
+    // Default to sunny if no match
     return 'https://wttr.in/png/sunny.png';
 }
 
-// ------------------------------
-// THEME TOGGLE
-// ------------------------------
+// Fallback emoji icons for when images fail to load
+function getWeatherEmoji(condition) {
+    if (condition.includes('sunny') || condition.includes('clear')) return '☀️';
+    if (condition.includes('cloud')) return '☁️';
+    if (condition.includes('partly')) return '⛅';
+    if (condition.includes('rain') || condition.includes('drizzle')) return '🌧️';
+    if (condition.includes('thunder') || condition.includes('storm')) return '⛈️';
+    if (condition.includes('snow')) return '❄️';
+    if (condition.includes('fog') || condition.includes('mist')) return '🌫️';
+    return '🌡️';
+
+
+// ========================
+// THEME TOGGLE FUNCTIONALITY
+// ========================
+// Toggle between light and dark themes
 themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
     
     if (document.body.classList.contains("dark")) {
-        themeToggle.textContent = "☀️";
+        // Switch to sun icon for dark mode
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
         saveTheme('dark');
     } else {
-        themeToggle.textContent = "🌙";
+        // Switch to moon icon for light mode
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
         saveTheme('light');
     }
 });
 
+
+// Load saved theme from localStorage
 function loadTheme() {
     const savedTheme = localStorage.getItem('weatherTheme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark');
-        themeToggle.textContent = "☀️";
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
     }
 }
 
+
+// Save theme preference to localStorage
 function saveTheme(theme) {
     localStorage.setItem('weatherTheme', theme);
 }
 
-// ------------------------------
-// SUGGESTIONS
-// ------------------------------
-function showSuggestions() {
-    suggestions.innerHTML = '';
+
+// ========================
+// CITY SUGGESTIONS
+// ========================
+// Render popular city quick-access buttons
+function renderSuggestions() {
+    suggestions.innerHTML = '<span class="quick-label">Popular:</span>';
+    
     popularCities.forEach(city => {
         const btn = document.createElement('button');
         btn.className = 'suggestion-btn';
         btn.textContent = city;
+        
+        // Add click handler for quick city selection
         btn.addEventListener('click', () => {
             cityInput.value = city;
             fetchWeather(city);
         });
+        
         suggestions.appendChild(btn);
     });
 }
 
-// ------------------------------
-// BACKGROUND UPDATE
-// ------------------------------
-function updateBackground(weatherCondition) {
-    const condition = weatherCondition.toLowerCase();
-    
-    bgImg.classList.add('zoomed');
-    
-    setTimeout(() => {
-        bgImg.classList.remove('zoomed');
-    }, 500);
-}
 
-// ------------------------------
+// ========================
 // KEYBOARD SHORTCUTS
-// ------------------------------
+// ========================
+// Global keyboard event listener
 document.addEventListener('keydown', (e) => {
-    // Press '/' to focus search
+    // Press '/' to focus search input
     if (e.key === '/' && document.activeElement !== cityInput) {
         e.preventDefault();
         cityInput.focus();
     }
     
-    // Press 'Escape' to blur search
+    // Press 'Escape' to blur search input
     if (e.key === 'Escape') {
         cityInput.blur();
     }
 });
 
-// ------------------------------
+
+// ========================
 // COPY WEATHER INFO
-// ------------------------------
+// ========================
+// Copy weather information to clipboard
+// NEW: Added dedicated button instead of double-click
+if (copyWeatherBtn) {
+    copyWeatherBtn.addEventListener('click', () => {
+        const temp = temperature.textContent;
+        const unit = document.querySelector('.temp-unit')?.textContent || '';
+        const city = cityName.textContent;
+        const condition = weatherText.textContent;
+        const humid = humidity.textContent;
+        const windSpeed = wind.textContent;
+        
+        const textToCopy = `Weather in ${city}: ${temp}${unit}, ${condition}\nHumidity: ${humid}\nWind: ${windSpeed}`;
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            showNotification('📋 Weather info copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            showNotification('❌ Failed to copy weather info');
+        });
+    });
+}
+
+
+// Double-click on weather info still works for copying
 weatherInfo.addEventListener('dblclick', () => {
     const temp = temperature.textContent;
     const city = cityName.textContent;
     const condition = weatherText.textContent;
     
     const textToCopy = `Weather in ${city}: ${temp}, ${condition}`;
+    
     navigator.clipboard.writeText(textToCopy).then(() => {
         showNotification('📋 Weather info copied!');
     });
 });
 
-// ------------------------------
-// NOTIFICATION
-// ------------------------------
+
+// ========================
+// NOTIFICATION SYSTEM
+// ========================
+// Show toast notification (NEW - improved notification)
 function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 15px 30px;
-        border-radius: 50px;
-        font-size: 14px;
-        z-index: 10000;
-        animation: fadeInUp 0.3s ease-out;
-    `;
     notification.textContent = message;
-    document.body.appendChild(notification);
+    notification.classList.add('show');
     
+    // Hide notification after 2.5 seconds
     setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(-50%) translateY(20px)';
-        notification.style.transition = 'all 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 2000);
+        notification.classList.remove('show');
+    }, 2500);
 }

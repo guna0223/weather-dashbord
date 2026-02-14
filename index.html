@@ -2,65 +2,227 @@
 <html lang="en">
 
 <head>
+    <!-- Meta tags for SEO and responsiveness -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Weather Dashboard - Check current weather conditions for any city" />
+    
+    <!-- Favicon - uses the sun icon from assets -->
     <link rel="shortcut icon" href="assets/images/favicon/sun.png" type="image/x-icon">
+    
+    <!-- Main stylesheet -->
     <link rel="stylesheet" href="assets/css/style.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Google Fonts - Poppins for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Weather Icons Library (using Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Page Title -->
     <title>Weather Dashboard</title>
 </head>
 
 <body>
-    <img src="assets/images/bg-img.jpg" class="bg-img" alt="Background">
-
-    <button id="themeToggle" title="Toggle Theme">🌙</button>
-
-    <div class="container">
-        <h1>☀️ Weather Dashboard</h1>
-
-        <div class="search-box">
-            <input type="text" id="cityInput" placeholder="Enter city name..." autocomplete="off" />
-            <button id="searchBtn">Search</button>
+    <!-- ========================
+         BACKGROUND LAYER
+         - Animated gradient background
+         - Creates atmosphere for weather app
+    ======================== -->
+    <div class="background-layer">
+        <div class="bg-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
         </div>
-
-        <div id="loading">
-            <span class="loading-spinner"></span>
-            Loading...
-        </div>
-
-        <div class="weather-suggestions" id="suggestions"></div>
-
-        <div class="weather-info" id="weatherInfo">
-            <img class="weather-icon" id="tempImage" alt="Weather Icon">
-            <h2 id="cityName"></h2>
-            <p class="temp-display" id="temperature"></p>
-            <p class="weather-desc" id="weather"></p>
-            
-            <div class="weather-details">
-                <div class="detail-item">
-                    <div class="icon">💧</div>
-                    <div class="label">Humidity</div>
-                    <div class="value" id="humidity"></div>
-                </div>
-                <div class="detail-item">
-                    <div class="icon">💨</div>
-                    <div class="label">Wind</div>
-                    <div class="value" id="wind"></div>
-                </div>
-                <div class="detail-item">
-                    <div class="icon">🌡️</div>
-                    <div class="label">Feels Like</div>
-                    <div class="value" id="feelsLike"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="errorContainer"></div>
     </div>
 
-    <!-- Weather condition info -->
-    <div id="weatherTips" style="display: none;"></div>
+    <!-- ========================
+         THEME TOGGLE BUTTON
+         - Fixed position top-right
+         - Switches between light/dark modes
+    ======================== -->
+    <button id="themeToggle" class="theme-toggle" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
 
+    <!-- ========================
+         MAIN CONTAINER
+         - Central card containing all weather info
+         - Uses glassmorphism effect
+    ======================== -->
+    <main class="container">
+        
+        <!-- ========================
+             HEADER SECTION
+             - App title and branding
+        ======================== -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fas fa-cloud-sun"></i>
+            </div>
+            <h1>Weather Dashboard</h1>
+            <p class="subtitle">Check weather conditions anywhere</p>
+        </header>
+
+        <!-- ========================
+             SEARCH SECTION
+             - City search input
+             - Search button with icon
+        ======================== -->
+        <section class="search-section">
+            <div class="search-box">
+                <i class="fas fa-map-marker-alt search-icon"></i>
+                <input 
+                    type="text" 
+                    id="cityInput" 
+                    placeholder="Enter city name..." 
+                    autocomplete="off" 
+                />
+                <button id="searchBtn" class="search-btn">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================
+             POPULAR CITIES
+             - Quick access buttons for common cities
+        ======================== -->
+        <section class="quick-cities" id="suggestions">
+            <span class="quick-label">Popular:</span>
+            <!-- City buttons will be injected by JavaScript -->
+        </section>
+
+        <!-- ========================
+             LOADING INDICATOR
+             - Shows during weather data fetch
+        ======================== -->
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <p>Fetching weather data...</p>
+        </div>
+
+        <!-- ========================
+             ERROR CONTAINER
+             - Displays error messages
+        ======================== -->
+        <div id="errorContainer"></div>
+
+        <!-- ========================
+             WEATHER INFO SECTION
+             - Main weather display card
+             - Shows current conditions
+        ======================== -->
+        <section class="weather-info" id="weatherInfo">
+            
+            <!-- Weather Header: City name and condition -->
+            <div class="weather-header">
+                <div class="location-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h2 id="cityName">--</h2>
+                </div>
+                <div class="weather-condition">
+                    <p id="weather">--</p>
+                </div>
+            </div>
+
+            <!-- Main Temperature Display -->
+            <div class="temperature-section">
+                <div class="weather-icon-container">
+                    <img class="weather-icon" id="tempImage" alt="Weather Icon">
+                </div>
+                <div class="temp-display">
+                    <span class="temp-value" id="temperature">--°C</span>
+                    <span class="temp-unit">/ --°F</span>
+                </div>
+            </div>
+
+            <!-- Weather Details Grid -->
+            <div class="weather-details">
+                <!-- Humidity Card -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <div class="detail-content">
+                        <span class="detail-label">Humidity</span>
+                        <span class="detail-value" id="humidity">--%</span>
+                    </div>
+                </div>
+
+                <!-- Wind Speed Card -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <div class="detail-content">
+                        <span class="detail-label">Wind</span>
+                        <span class="detail-value" id="wind">-- km/h</span>
+                    </div>
+                </div>
+
+                <!-- Feels Like Temperature Card -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-thermometer-half"></i>
+                    </div>
+                    <div class="detail-content">
+                        <span class="detail-label">Feels Like</span>
+                        <span class="detail-value" id="feelsLike">--°C</span>
+                    </div>
+                </div>
+
+                <!-- Visibility Card (NEW) -->
+                <div class="detail-card">
+                    <div class="detail-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="detail-content">
+                        <span class="detail-label">Visibility</span>
+                        <span class="detail-value" id="visibility">-- km</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info Section -->
+            <div class="additional-info">
+                <div class="info-item">
+                    <i class="fas fa-compress-arrows-alt"></i>
+                    <span id="pressure">-- hPa</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-sun"></i>
+                    <span id="uvIndex">-- UV</span>
+                </div>
+            </div>
+
+            <!-- Copy Weather Button (NEW) -->
+            <button class="copy-btn" id="copyWeatherBtn">
+                <i class="fas fa-copy"></i> Copy Weather Info
+            </button>
+        </section>
+
+        <!-- ========================
+             FOOTER
+             - App credits and info
+        ======================== -->
+        <footer class="app-footer">
+            <p>Powered by <a href="https://wttr.in" target="_blank">Weather API</a></p>
+        </footer>
+
+    </main>
+
+    <!-- ========================
+         NOTIFICATION TOAST
+         - Shows temporary notifications
+    ======================== -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Main JavaScript file -->
     <script src="assets/js/script.js"></script>
 </body>
 
