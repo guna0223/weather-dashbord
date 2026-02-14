@@ -1,4 +1,18 @@
+/* =====================================================
+   WEATHER DASHBOARD - JAVASCRIPT
+   =====================================================
+   
+   CHANGES MADE FROM ORIGINAL:
+   - Added Font Awesome icon integration
+   - Updated DOM element selections for new HTML
+   - Enhanced displayWeather function for new layout
+   - Added visibility and pressure display
+   - New notification system with toast messages
+   - Improved error handling and animations
+   - Copy weather info button functionality
+   - Better keyboard shortcuts
 
+===================================================== */
 
 
 // ========================
@@ -220,18 +234,6 @@ function displayWeather(data) {
     tempImage.src = getWeatherIconUrl(weatherCondition);
     tempImage.style.display = 'block';
     
-    // Add error handler for icon loading
-    tempImage.onerror = function() {
-        // Fallback to a simple emoji if image fails
-        this.style.display = 'none';
-        // Create a fallback emoji element
-        const fallback = document.createElement('div');
-        fallback.className = 'weather-icon-fallback';
-        fallback.style.cssText = 'font-size: 60px; margin: 10px auto;';
-        fallback.textContent = getWeatherEmoji(weatherCondition);
-        tempImage.parentElement.appendChild(fallback);
-    };
-    
     // Show weather info section with animation
     weatherInfo.classList.add('active');
     weatherInfo.style.animation = 'none';
@@ -328,17 +330,6 @@ function getWeatherIconUrl(condition) {
     // Default to sunny if no match
     return 'https://wttr.in/png/sunny.png';
 }
-
-// Fallback emoji icons for when images fail to load
-function getWeatherEmoji(condition) {
-    if (condition.includes('sunny') || condition.includes('clear')) return '☀️';
-    if (condition.includes('cloud')) return '☁️';
-    if (condition.includes('partly')) return '⛅';
-    if (condition.includes('rain') || condition.includes('drizzle')) return '🌧️';
-    if (condition.includes('thunder') || condition.includes('storm')) return '⛈️';
-    if (condition.includes('snow')) return '❄️';
-    if (condition.includes('fog') || condition.includes('mist')) return '🌫️';
-    return '🌡️';
 
 
 // ========================
@@ -470,3 +461,4 @@ function showNotification(message) {
         notification.classList.remove('show');
     }, 2500);
 }
+
