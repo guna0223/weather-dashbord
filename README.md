@@ -45,18 +45,3 @@ Example cities: `London`, `Tokyo`, `Chennai`, `New York`
 https://wttr.in/Chennai?format=j1
 
 
-## 🎯 Future Improvements
-
-- Add 3-day forecast
-- Save previous searches
-- Add weather icons
-- Auto-detect user location
-
-## 📸 Screenshot (Add Image)
-
-> *(You can add a screenshot here later)*
-
-## 📝 License
-
-This project is open-source. Feel free to modify and improve it! 🚀
-
